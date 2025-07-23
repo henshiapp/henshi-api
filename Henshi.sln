@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Henshi.Web", "Henshi.Web\Henshi.Web.csproj", "{51032710-5557-4C9F-B965-D4AEBE35EFDD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Henshi.Flashcards", "Henshi.Flashcards\Henshi.Flashcards.csproj", "{BFB11F96-B57A-47C5-81EB-9E4FB379BD52}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{51032710-5557-4C9F-B965-D4AEBE35EFDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51032710-5557-4C9F-B965-D4AEBE35EFDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51032710-5557-4C9F-B965-D4AEBE35EFDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51032710-5557-4C9F-B965-D4AEBE35EFDD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BFB11F96-B57A-47C5-81EB-9E4FB379BD52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BFB11F96-B57A-47C5-81EB-9E4FB379BD52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BFB11F96-B57A-47C5-81EB-9E4FB379BD52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BFB11F96-B57A-47C5-81EB-9E4FB379BD52}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
