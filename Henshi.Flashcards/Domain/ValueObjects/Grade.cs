@@ -1,6 +1,6 @@
 using System;
 
-namespace Henshi.Flashcards.Domain;
+namespace Henshi.Flashcards.Domain.ValueObjects;
 
 public enum Grade
 {

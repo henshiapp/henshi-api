@@ -1,9 +1,10 @@
 using Henshi.Flashcards.Domain.Models;
-using Henshi.Flashcards.Infraestructure;
 using Henshi.Flashcards.Infraestructure.Database;
+using Henshi.Flashcards.Presentation.Dtos;
+using Henshi.Shared.Presentation.Dtos;
 using Microsoft.EntityFrameworkCore;
 
-namespace Henshi.Flashcards.Application.Extensions;
+namespace Henshi.Flashcards.Infraestructure.Repositories;
 
 public class EfFlashcardCollectionRepository : IFlashcardCollectionRepository
 {
@@ -26,6 +27,12 @@ public class EfFlashcardCollectionRepository : IFlashcardCollectionRepository
         return Task.CompletedTask;
     }
 
+    public Task DeleteAsync(Guid id)
+    {
+        _dbContext.Remove(id);
+        return Task.CompletedTask;
+    }
+
     public async Task<FlashcardCollection?> GetByIdAsync(Guid id)
     {
         return await _dbContext.FlashcardCollections.FindAsync(id);
@@ -34,6 +41,31 @@ public class EfFlashcardCollectionRepository : IFlashcardCollectionRepository
     public async Task<List<FlashcardCollection>> ListAsync()
     {
         return await _dbContext.FlashcardCollections.ToListAsync();
+    }
+
+    public async Task<(List<FlashcardCollection>, PaginationMetadata)> ListAsync(string? search, int page, int pageSize)
+    {
+        var baseQuery = _dbContext.FlashcardCollections.AsQueryable();
+        
+        var offset = page * pageSize;
+        var limit = pageSize;
+
+        if (search is not null)
+        {
+            baseQuery = baseQuery.Where(c => search.Contains(c.Title) || (c.Description != null && search.Contains(c.Description)));
+        }
+
+        var paginatedQuery = baseQuery.Skip(offset).Take(limit);
+        var elementsCount = await baseQuery.CountAsync();
+
+        return (await paginatedQuery.ToListAsync(), new PaginationMetadata
+        {
+            Page = page,
+            Offset = offset,
+            Size = pageSize,
+            TotalElements = elementsCount,
+            TotalPages = elementsCount / pageSize
+        });
     }
 
     public Task SaveChangesAsync()

@@ -1,5 +1,5 @@
 using System;
-using Henshi.Flashcards.Domain;
+using Henshi.Flashcards.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

@@ -1,6 +1,5 @@
 using System;
 using Microsoft.EntityFrameworkCore;
-using Henshi.Flashcards.Domain;
 using System.Reflection;
 using Henshi.Flashcards.Domain.Models;
 
@@ -20,5 +19,12 @@ public class FlashcardDbContext : DbContext
         modelBuilder.HasDefaultSchema("flashcards");
 
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+    }
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        base.ConfigureConventions(configurationBuilder);
+
+        configurationBuilder.Properties<Enum>().HaveConversion<string>();
     }
 }

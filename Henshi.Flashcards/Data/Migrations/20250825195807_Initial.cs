@@ -40,7 +40,7 @@ namespace Henshi.Flashcards.Data.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     question = table.Column<string>(type: "text", nullable: false),
                     answer = table.Column<string>(type: "text", nullable: false),
-                    grade = table.Column<int>(type: "integer", nullable: false),
+                    grade = table.Column<string>(type: "text", nullable: false),
                     next_recall = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),

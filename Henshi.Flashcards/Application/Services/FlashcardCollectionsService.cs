@@ -1,14 +1,17 @@
 using System;
+using System.Runtime.CompilerServices;
 using Henshi.Flashcards.Domain.Models;
-using Henshi.Flashcards.Infraestructure;
+using Henshi.Flashcards.Infraestructure.Repositories;
+using Henshi.Flashcards.Presentation.Dtos;
+using Henshi.Shared.Presentation.Dtos;
 
-namespace Henshi.Flashcards.Application;
+namespace Henshi.Flashcards.Application.Services;
 
-public class FlashcardCollectionsService : IFlashcardCollectionsService
+public class FlashcardCollectionService : IFlashcardCollectionService
 {
     private readonly IFlashcardCollectionRepository _flashcardCollectionRepository;
 
-    public FlashcardCollectionsService(IFlashcardCollectionRepository flashcardCollectionRepository)
+    public FlashcardCollectionService(IFlashcardCollectionRepository flashcardCollectionRepository)
     {
         _flashcardCollectionRepository = flashcardCollectionRepository;
     }
@@ -19,8 +22,14 @@ public class FlashcardCollectionsService : IFlashcardCollectionsService
         await _flashcardCollectionRepository.SaveChangesAsync();
     }
 
-    public async Task<List<FlashcardCollection>> List()
+    public async Task Delete(Guid id)
     {
-        return await _flashcardCollectionRepository.ListAsync();
+        await _flashcardCollectionRepository.DeleteAsync(id);
+        await _flashcardCollectionRepository.SaveChangesAsync();
+    }
+
+    public async Task<(List<FlashcardCollection>, PaginationMetadata)> List(string? search, int page, int pageSize)
+    {
+        return await _flashcardCollectionRepository.ListAsync(search, page, pageSize);
     }
 }

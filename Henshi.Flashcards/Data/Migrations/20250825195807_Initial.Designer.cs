@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Henshi.Flashcards.Data.Migrations
 {
     [DbContext(typeof(FlashcardDbContext))]
-    [Migration("20250705190632_Initial")]
+    [Migration("20250825195807_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -26,7 +26,7 @@ namespace Henshi.Flashcards.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Henshi.Flashcards.Domain.Flashcard", b =>
+            modelBuilder.Entity("Henshi.Flashcards.Domain.Models.Flashcard", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -46,8 +46,9 @@ namespace Henshi.Flashcards.Data.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<int>("Grade")
-                        .HasColumnType("integer")
+                    b.Property<string>("Grade")
+                        .IsRequired()
+                        .HasColumnType("text")
                         .HasColumnName("grade");
 
                     b.Property<DateTime>("NextRecall")
@@ -68,7 +69,7 @@ namespace Henshi.Flashcards.Data.Migrations
                     b.ToTable("flashcards", "flashcards");
                 });
 
-            modelBuilder.Entity("Henshi.Flashcards.Domain.FlashcardCollection", b =>
+            modelBuilder.Entity("Henshi.Flashcards.Domain.Models.FlashcardCollection", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
