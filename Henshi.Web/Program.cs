@@ -16,8 +16,8 @@ var builder = WebApplication.CreateBuilder(args);
         })
         .AddJwtBearer("Bearer", options =>
         {
-            options.Authority = builder.Configuration["Auth0:Domain"];
-            options.Audience = builder.Configuration["Auth0:Audience"];
+            options.Authority = builder.Configuration["AUTH0_AUTHORITY"];
+            options.Audience = builder.Configuration["AUTH0_AUDIENCE"];
         });
     builder.Services.AddAuthorization();
 
@@ -61,7 +61,7 @@ var app = builder.Build();
     // app.UseHttpsRedirection();
     app.UseCors(option =>
         option
-            .WithOrigins("http://localhost:3000")
+            .WithOrigins(builder.Configuration["Cors:Origins"]!)
             .AllowCredentials()
             .AllowAnyHeader()
     );
