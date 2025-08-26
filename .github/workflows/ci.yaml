@@ -59,7 +59,7 @@ jobs:
           push: true
           tags: |
             ${{ env.IMAGE_NAME }}:latest
-            ${{ env.IMAGE_NAME }}:${{ steps.semantic-release.outputs.next_release_version }}
+            ${{ env.IMAGE_NAME }}:${{ steps.semantic-release.outputs.next_release_version || github.sha }}
           platforms: linux/amd64,linux/arm64
           build-args: |
             BUILD_CONFIGURATION=${{ env.BUILD_CONFIGURATION }}
