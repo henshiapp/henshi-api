@@ -9,7 +9,8 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "AUTH0_AUTHORITY": "",
-        "AUTH0_AUDIENCE": ""
+        "AUTH0_AUDIENCE": "",
+        "DATABASE_ENCRYPTION_KEY": ""
       }
     },
     "https": {
@@ -20,7 +21,8 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "AUTH0_AUTHORITY": "",
-        "AUTH0_AUDIENCE": ""
+        "AUTH0_AUDIENCE": "",
+        "DATABASE_ENCRYPTION_KEY": ""
       }
     }
   }
