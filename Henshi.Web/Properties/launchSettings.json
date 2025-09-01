@@ -8,7 +8,7 @@
       "applicationUrl": "http://localhost:5059",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "AUTH0_AUTHORITY": "",
+        "AUTH0_DOMAIN": "",
         "AUTH0_AUDIENCE": "",
         "DATABASE_ENCRYPTION_KEY": ""
       }

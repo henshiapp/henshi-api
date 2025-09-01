@@ -16,7 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
         })
         .AddJwtBearer("Bearer", options =>
         {
-            options.Authority = builder.Configuration["AUTH0_AUTHORITY"];
+            options.Authority = $"https://{builder.Configuration["AUTH0_DOMAIN"]}";
             options.Audience = builder.Configuration["AUTH0_AUDIENCE"];
         });
     builder.Services.AddAuthorization();
