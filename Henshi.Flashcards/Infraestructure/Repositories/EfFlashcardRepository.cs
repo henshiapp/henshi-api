@@ -49,7 +49,7 @@ public class EfFlashcardRepository : IFlashcardRepository
     {
         var baseQuery = _dbContext.Flashcards.AsQueryable();
 
-        var offset = page * pageSize;
+        var offset = (page - 1) * pageSize;
         var limit = pageSize;
 
         if (search is not null)
