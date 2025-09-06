@@ -16,9 +16,9 @@ public class FlashcardCollectionService : IFlashcardCollectionService
         _flashcardCollectionRepository = flashcardCollectionRepository;
     }
 
-    public async Task Create(string title, string? description, string icon)
+    public async Task Create(string title, string? description, string icon, string userId)
     {
-        await _flashcardCollectionRepository.AddAsync(new FlashcardCollection(title, description, icon, "1"));
+        await _flashcardCollectionRepository.AddAsync(new FlashcardCollection(title, description, icon, userId));
         await _flashcardCollectionRepository.SaveChangesAsync();
     }
 
@@ -28,8 +28,8 @@ public class FlashcardCollectionService : IFlashcardCollectionService
         await _flashcardCollectionRepository.SaveChangesAsync();
     }
 
-    public async Task<(List<FlashcardCollection>, PaginationMetadata)> List(string? search, int page, int pageSize)
+    public async Task<(List<FlashcardCollection>, PaginationMetadata)> List(string userId, string? search, string search1, int page, int pageSize)
     {
-        return await _flashcardCollectionRepository.ListAsync(search, page, pageSize);
+        return await _flashcardCollectionRepository.ListAsync(userId, search, page, pageSize);
     }
 }

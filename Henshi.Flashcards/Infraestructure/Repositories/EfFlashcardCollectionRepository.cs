@@ -43,9 +43,9 @@ public class EfFlashcardCollectionRepository : IFlashcardCollectionRepository
         return await _dbContext.FlashcardCollections.ToListAsync();
     }
 
-    public async Task<(List<FlashcardCollection>, PaginationMetadata)> ListAsync(string? search, int page, int pageSize)
+    public async Task<(List<FlashcardCollection>, PaginationMetadata)> ListAsync(string userId, string? search, int page, int pageSize)
     {
-        var baseQuery = _dbContext.FlashcardCollections.AsQueryable();
+        var baseQuery = _dbContext.FlashcardCollections.AsQueryable().Where(c => c.UserId == userId);
         
         var offset = (page - 1) * pageSize;
         var limit = pageSize;

@@ -1,4 +1,5 @@
-﻿using Henshi.Flashcards.Application.Services;
+﻿using System.Security.Claims;
+using Henshi.Flashcards.Application.Services;
 using Henshi.Flashcards.Domain.Models;
 using Henshi.Flashcards.Presentation.Dtos;
 using Henshi.Shared.Presentation.Dtos;
@@ -27,10 +28,15 @@ public class FlashcardCollectionsController : Controller
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateFlashcardCollectionRequest request)
     {
+        var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+        if (userId is null) return Unauthorized();
+
         await _flashcardCollectionsService.Create(
             request.Title,
             request.Description,
-            request.Icon
+            request.Icon,
+            userId
         );
 
         return Ok(ApiResponse<Task>.Success("Card collection created successfully!"));
@@ -39,7 +45,11 @@ public class FlashcardCollectionsController : Controller
     [HttpGet]
     public async Task<IActionResult> List([FromQuery] ListFlashcardCollectionRequest request)
     {
-        var (list, metadata) = await _flashcardCollectionsService.List(request.Search, request.Page, request.PageSize);
+        var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+        if (userId is null) return Unauthorized();
+
+        var (list, metadata) = await _flashcardCollectionsService.List(userId, request.Search, request.Page, request.PageSize);
 
         return Ok(
             ApiResponse<List<FlashcardCollection>>.Success(list, metadata)
