@@ -38,7 +38,10 @@ public class Flashcard
     public DateTime UpdatedAt { get; private set; } = DateTime.UtcNow;
 
     [Column("collection_id")]
+    [ForeignKey("Collection")]
     public Guid CollectionId { get; private set; }
+
+    public virtual FlashcardCollection Collection { get; set; }
 
     public Flashcard(string question, string answer, Grade grade, DateTime nextRecall, Guid collectionId)
     {

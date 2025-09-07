@@ -1,13 +1,9 @@
-using Henshi.Shared.Presentation.Dtos;
-
 namespace Henshi.Shared.Infraestructure.Repositories;
 
 public interface IBaseRepository<T>
 {
-    Task<T?> GetByIdAsync(Guid id);
-    Task<(List<T>, PaginationMetadata)> ListAsync(string userId, string? search, int page, int pageSize);
+    Task<T?> GetByIdAsync(Guid id, string userId);
     Task AddAsync(T entity);
-    Task DeleteAsync(T entity);
-    Task DeleteAsync(Guid id);
+    void Delete(T entity);
     Task SaveChangesAsync();
 }

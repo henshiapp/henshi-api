@@ -30,7 +30,7 @@ public class FlashcardCollection
     [Column("updated_at")]
     public DateTime UpdatedAt { get; private set; } = DateTime.UtcNow;
 
-    public readonly IReadOnlyList<Flashcard> Flashcards = [];
+    public virtual ICollection<Flashcard> Flashcards { get; set; }
 
     public FlashcardCollection(string title, string? description, string icon, string userId)
     {

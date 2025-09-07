@@ -1,53 +1,32 @@
 using Henshi.Flashcards.Domain.Models;
+using Henshi.Flashcards.Domain.Repositories;
 using Henshi.Flashcards.Infraestructure.Database;
-using Henshi.Flashcards.Presentation.Dtos;
+using Henshi.Shared.Infraestructure.Repositories;
 using Henshi.Shared.Presentation.Dtos;
 using Microsoft.EntityFrameworkCore;
 
 namespace Henshi.Flashcards.Infraestructure.Repositories;
 
-public class EfFlashcardRepository : IFlashcardRepository
+public class EfFlashcardRepository : BaseRepository<Flashcard>, IFlashcardRepository
 {
     private readonly FlashcardDbContext _dbContext;
 
-    public EfFlashcardRepository(FlashcardDbContext dbContext)
+    public EfFlashcardRepository(FlashcardDbContext dbContext) : base(dbContext)
     {
         _dbContext = dbContext;
     }
 
-    public Task AddAsync(Flashcard entity)
+    public override async Task<Flashcard?> GetByIdAsync(Guid id, string userId)
     {
-        _dbContext.AddAsync(entity);
-        return Task.CompletedTask;
+        return await _dbContext.Flashcards
+            .Where(f => f.Id == id && f.Collection.UserId == userId)
+            .SingleOrDefaultAsync();
     }
 
-    public Task DeleteAsync(Flashcard entity)
+    public async Task<(List<Flashcard>, PaginationMetadata)> ListAsync(Guid collectionId, string? search, string userId, int page, int pageSize)
     {
-        _dbContext.Remove(entity);
-        return Task.CompletedTask;
-    }
-
-    public Task DeleteAsync(Guid id)
-    {
-        _dbContext.Remove(id);
-        return Task.CompletedTask;
-    }
-
-    public async Task<Flashcard?> GetByIdAsync(Guid id)
-    {
-        return await _dbContext.Flashcards.FindAsync(id);
-    }
-
-    public async Task<List<Flashcard>> ListAllAvailableForRecallAsync(Guid collectionId)
-    {
-        return await _dbContext.Flashcards.AsQueryable()
-            .Where(f => f.CollectionId == collectionId && f.NextRecall <= DateTime.UtcNow)
-            .ToListAsync();
-    }
-
-    public async Task<(List<Flashcard>, PaginationMetadata)> ListAsync(string? search, int page, int pageSize)
-    {
-        var baseQuery = _dbContext.Flashcards.AsQueryable();
+        var baseQuery = _dbContext.Flashcards.AsQueryable()
+            .Where(f => f.CollectionId == collectionId && f.Collection.UserId == userId);
 
         var offset = (page - 1) * pageSize;
         var limit = pageSize;
@@ -70,16 +49,17 @@ public class EfFlashcardRepository : IFlashcardRepository
         });
     }
 
-    public Task<List<Flashcard>> ListByCollectionId(Guid collectionId)
+    public async Task<List<Flashcard>> ListAllAvailableForRecallAsync(Guid collectionId, string userId)
     {
-        return _dbContext.Flashcards.AsQueryable()
-            .Where(f => f.CollectionId == collectionId)
+        return await _dbContext.Flashcards.AsQueryable()
+            .Where(f => f.CollectionId == collectionId && f.Collection.UserId == userId && f.NextRecall <= DateTime.UtcNow)
             .ToListAsync();
     }
 
-    public Task SaveChangesAsync()
+    public Task<List<Flashcard>> ListByCollectionId(Guid collectionId, string userId)
     {
-        _dbContext.SaveChangesAsync();
-        return Task.CompletedTask;
+        return _dbContext.Flashcards.AsQueryable()
+            .Where(f => f.CollectionId == collectionId && f.Collection.UserId == userId)
+            .ToListAsync();
     }
 }

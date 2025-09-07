@@ -64,6 +64,7 @@ var app = builder.Build();
             .WithOrigins(builder.Configuration["Cors:Origins"]!)
             .AllowCredentials()
             .AllowAnyHeader()
+            .AllowAnyMethod()
     );
 
     app.UseAuthentication();
