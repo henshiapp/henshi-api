@@ -7,9 +7,9 @@ namespace Henshi.Flashcards.Application.Services;
 
 public interface IFlashcardService
 {
-    Task Create(string question, string answer, Guid collectionId);
-    Task Delete(Guid id);
-    Task<List<Flashcard>> ListAvailableForRecall(Guid collectionId);
-    Task<(List<Flashcard>, PaginationMetadata)> List(string? search, int page, int pageSize);
-    Task SaveRecall(Guid collectionId, List<RecallFlashcardsResult> answers);
+    Task Create(string question, string answer, Guid collectionId, string userId);
+    Task<Guid?> Delete(Guid id, string userId);
+    Task<List<Flashcard>> ListAvailableForRecall(Guid collectionId, string userId);
+    Task<(List<Flashcard>, PaginationMetadata)> List(Guid collectionId, string? search, int page, int pageSize, string userId);
+    Task SaveRecall(Guid collectionId, List<RecallFlashcardsResult> answers, string userId);
 }

@@ -1,47 +1,48 @@
-using System;
-using System.Runtime.CompilerServices;
 using Henshi.Flashcards.Domain.Models;
-using Henshi.Flashcards.Infraestructure;
-using Henshi.Flashcards.Infraestructure.Repositories;
+using Henshi.Flashcards.Domain.Repositories;
 using Henshi.Flashcards.Presentation.Dtos;
 using Henshi.Shared.Presentation.Dtos;
 
 namespace Henshi.Flashcards.Application.Services;
 
-public class FlashcardService : IFlashcardService
+public class FlashcardService(IFlashcardRepository flashcardRepository) : IFlashcardService
 {
-    private readonly IFlashcardRepository _flashcardRepository;
+    private readonly IFlashcardRepository _flashcardRepository = flashcardRepository;
 
-    public FlashcardService(IFlashcardRepository flashcardRepository)
-    {
-        _flashcardRepository = flashcardRepository;
-    }
-
-    public async Task Create(string question, string answer, Guid cardCollectionId)
+    public async Task Create(string question, string answer, Guid cardCollectionId, string userId)
     {
         await _flashcardRepository.AddAsync(Flashcard.Create(question, answer, cardCollectionId));
         await _flashcardRepository.SaveChangesAsync();
     }
 
-    public async Task Delete(Guid id)
+    public async Task<Guid?> Delete(Guid id, string userId)
     {
-        await _flashcardRepository.DeleteAsync(id);
+        var flashcard = await _flashcardRepository.GetByIdAsync(id, userId);
+
+        if (flashcard is null)
+        {
+            return null;
+        }
+
+        _flashcardRepository.Delete(flashcard);
         await _flashcardRepository.SaveChangesAsync();
+
+        return id;
     }
 
-    public async Task<(List<Flashcard>, PaginationMetadata)> List(string? search, int page, int pageSize)
+    public async Task<(List<Flashcard>, PaginationMetadata)> List(Guid collectionId, string? search, int page, int pageSize, string userId)
     {
-        return await _flashcardRepository.ListAsync(search, page, pageSize);
+        return await _flashcardRepository.ListAsync(collectionId, search, userId, page, pageSize);
     }
 
-    public async Task<List<Flashcard>> ListAvailableForRecall(Guid collectionId)
+    public async Task<List<Flashcard>> ListAvailableForRecall(Guid collectionId, string userId)
     {
-        return await _flashcardRepository.ListAllAvailableForRecallAsync(collectionId);
+        return await _flashcardRepository.ListAllAvailableForRecallAsync(collectionId, userId);
     }
 
-    public async Task SaveRecall(Guid collectionId, List<RecallFlashcardsResult> answers)
+    public async Task SaveRecall(Guid collectionId, List<RecallFlashcardsResult> answers, string userId)
     {
-        var flashcards = await _flashcardRepository.ListByCollectionId(collectionId);
+        var flashcards = await _flashcardRepository.ListByCollectionId(collectionId, userId);
 
         foreach (var answer in answers)
         {
