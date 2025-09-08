@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Henshi.Flashcards.Presentation.Controllers;
 
 [ApiController]
-[Route("/api/v1/card-collections")]
+[Route("/v1/card-collections")]
 [Authorize]
 public class FlashcardCollectionsController(
     IFlashcardCollectionService flashcardCollectionsService,
