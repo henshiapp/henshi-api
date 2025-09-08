@@ -36,7 +36,7 @@ public class EfFlashcardRepository : BaseRepository<Flashcard>, IFlashcardReposi
             baseQuery = baseQuery.Where(f => search.Contains(f.Answer) || search.Contains(f.Question));
         }
 
-        var paginatedQuery = baseQuery.Skip(offset).Take(limit);
+        var paginatedQuery = baseQuery.OrderBy(f => f.CreatedAt).Skip(offset).Take(limit);
         var elementsCount = await baseQuery.CountAsync();
 
         return (await paginatedQuery.ToListAsync(), new PaginationMetadata
