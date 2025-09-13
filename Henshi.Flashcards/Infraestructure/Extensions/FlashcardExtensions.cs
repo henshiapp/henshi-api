@@ -22,6 +22,8 @@ public static class FlashcardServiceExtensions
         services.AddScoped<IFlashcardRepository, EfFlashcardRepository>();
         services.AddScoped<IFlashcardService, FlashcardService>();
 
+        services.AddScoped<IFlashcardStatsService, FlashcardStatsService>();
+
         return services;
     }
 }

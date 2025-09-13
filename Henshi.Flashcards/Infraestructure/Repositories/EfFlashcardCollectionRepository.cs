@@ -25,16 +25,26 @@ public class EfFlashcardCollectionRepository : BaseRepository<FlashcardCollectio
             .SingleOrDefaultAsync();
     }
 
+    public async Task<long> GetCount(string userId)
+    {
+        return await _dbContext.FlashcardCollections.AsNoTracking()
+            .Where(c => c.UserId == userId)
+            .CountAsync();
+    }
+
     public async Task<(List<FlashcardCollection>, PaginationMetadata)> ListAsync(string? search, string userId, int page, int pageSize)
     {
-        var baseQuery = _dbContext.FlashcardCollections.AsQueryable().Where(c => c.UserId == userId);
-        
+        var baseQuery = _dbContext.FlashcardCollections.AsQueryable().AsNoTracking()
+            .Where(c => c.UserId == userId);
+
         var offset = (page - 1) * pageSize;
         var limit = pageSize;
 
         if (search is not null)
         {
-            baseQuery = baseQuery.Where(c => search.Contains(c.Title) || (c.Description != null && search.Contains(c.Description)));
+            var searchLowered = search.ToLower();
+            baseQuery = baseQuery.Where(c => c.Title.ToLower().Contains(searchLowered)
+                || (c.Description != null && c.Description.ToLower().Contains(searchLowered)));
         }
 
         var paginatedQuery = baseQuery.OrderBy(c => c.CreatedAt).Skip(offset).Take(limit);

@@ -14,11 +14,13 @@ namespace Henshi.Flashcards.Presentation.Controllers;
 [Authorize]
 public class FlashcardCollectionsController(
     IFlashcardCollectionService flashcardCollectionsService,
-    IFlashcardService flashcardService
+    IFlashcardService flashcardService,
+    IFlashcardStatsService flashcardStatsService
 ) : Controller
 {
     private readonly IFlashcardCollectionService _flashcardCollectionsService = flashcardCollectionsService;
     private readonly IFlashcardService _flashcardService = flashcardService;
+    private readonly IFlashcardStatsService _flashcardStatsService = flashcardStatsService;
 
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateFlashcardCollectionRequest request)
@@ -131,5 +133,15 @@ public class FlashcardCollectionsController(
 
         await _flashcardService.SaveRecall(collectionId, request.Answers, userId);
         return Ok(ApiResponse<Task>.Success("Recall saved successfully!"));
+    }
+
+    [HttpGet("stats")]
+    public async Task<IActionResult> Stats()
+    {
+        var userId = User.Id();
+
+        if (userId is null) return Unauthorized();
+
+        return Ok(await _flashcardStatsService.GetStats(userId));
     }
 }

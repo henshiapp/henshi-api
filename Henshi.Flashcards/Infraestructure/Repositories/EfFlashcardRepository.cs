@@ -4,6 +4,7 @@ using Henshi.Flashcards.Infraestructure.Database;
 using Henshi.Shared.Infraestructure.Repositories;
 using Henshi.Shared.Presentation.Dtos;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens.Experimental;
 
 namespace Henshi.Flashcards.Infraestructure.Repositories;
 
@@ -25,7 +26,7 @@ public class EfFlashcardRepository : BaseRepository<Flashcard>, IFlashcardReposi
 
     public async Task<(List<Flashcard>, PaginationMetadata)> ListAsync(Guid collectionId, string? search, string userId, int page, int pageSize)
     {
-        var baseQuery = _dbContext.Flashcards.AsQueryable()
+        var baseQuery = _dbContext.Flashcards.AsQueryable().AsNoTracking()
             .Where(f => f.CollectionId == collectionId && f.Collection.UserId == userId);
 
         var offset = (page - 1) * pageSize;
@@ -33,7 +34,9 @@ public class EfFlashcardRepository : BaseRepository<Flashcard>, IFlashcardReposi
 
         if (search is not null)
         {
-            baseQuery = baseQuery.Where(f => search.Contains(f.Answer) || search.Contains(f.Question));
+            var searchLowered = search.ToLower();
+            baseQuery = baseQuery.Where(f => EF.Functions.Like(f.Question.ToLower(), $"%{searchLowered}%")
+                || EF.Functions.Like(f.Answer.ToLower(), $"%{searchLowered}%"));
         }
 
         var paginatedQuery = baseQuery.OrderBy(f => f.CreatedAt).Skip(offset).Take(limit);
@@ -61,5 +64,12 @@ public class EfFlashcardRepository : BaseRepository<Flashcard>, IFlashcardReposi
         return _dbContext.Flashcards.AsQueryable()
             .Where(f => f.CollectionId == collectionId && f.Collection.UserId == userId)
             .ToListAsync();
+    }
+
+    public async Task<long> GetCount(string userId)
+    {
+        return await _dbContext.Flashcards.AsNoTracking()
+            .Where(f => f.Collection.UserId == userId)
+            .CountAsync();
     }
 }
