@@ -7,4 +7,5 @@ namespace Henshi.Flashcards.Domain.Repositories;
 public interface IFlashcardCollectionRepository : IBaseRepository<FlashcardCollection>
 {
     public Task<(List<FlashcardCollection>, PaginationMetadata)> ListAsync(string? search, string userId, int page, int pageSize);
+    Task<long> GetCount(string userId);
 }

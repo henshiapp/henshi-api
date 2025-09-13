@@ -1,12 +1,8 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Formats.Asn1;
-using System.Runtime.InteropServices;
 using Ardalis.GuardClauses;
 using EntityFrameworkCore.EncryptColumn.Attribute;
 using Henshi.Flashcards.Domain.ValueObjects;
-using Microsoft.EntityFrameworkCore;
 
 namespace Henshi.Flashcards.Domain.Models;
 
@@ -18,11 +14,9 @@ public class Flashcard
     public Guid Id { get; private set; } = Guid.NewGuid();
 
     [Column("question")]
-    [EncryptColumn]
     public string Question { get; set; } = string.Empty;
 
     [Column("answer")]
-    [EncryptColumn]
     public string Answer { get; set; } = string.Empty;
 
     [Column("grade")]
