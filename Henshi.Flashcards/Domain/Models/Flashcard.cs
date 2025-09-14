@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Ardalis.GuardClauses;
-using EntityFrameworkCore.EncryptColumn.Attribute;
 using Henshi.Flashcards.Domain.ValueObjects;
 
 namespace Henshi.Flashcards.Domain.Models;
@@ -20,10 +19,25 @@ public class Flashcard
     public string Answer { get; set; } = string.Empty;
 
     [Column("grade")]
-    public Grade Grade { get; private set; }
+    public Grade Grade { get; private set; } = Grade.Again;
+
+    [Column("state")]
+    public State State { get; private set; } = State.Learning;
+
+    [Column("step")]
+    public int? Step { get; private set; } = 0;
+
+    [Column("stability")]
+    public double? Stability { get; private set; }
+
+    [Column("difficulty")]
+    public double? Difficulty { get; private set; }
 
     [Column("next_recall")]
     public DateTime NextRecall { get; private set; }
+
+    [Column("last_recall")]
+    public DateTime? LastRecall { get; private set; }
 
     [Column("created_at")]
     public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
@@ -37,12 +51,28 @@ public class Flashcard
 
     public virtual FlashcardCollection Collection { get; set; }
 
-    public Flashcard(string question, string answer, Grade grade, DateTime nextRecall, Guid collectionId)
+    public Flashcard(
+        string question,
+        string answer,
+        Grade grade,
+        State state,
+        int? step,
+        double? stability,
+        double? difficulty,
+        DateTime nextRecall,
+        DateTime? lastRecall,
+        Guid collectionId
+    )
     {
         Question = Guard.Against.NullOrEmpty(question);
         Answer = Guard.Against.NullOrEmpty(answer);
         Grade = Guard.Against.Null(grade);
+        State = Guard.Against.Null(state);
+        Step = step;
+        Stability = stability;
+        Difficulty = difficulty;
         NextRecall = Guard.Against.Null(nextRecall);
+        LastRecall = lastRecall;
         CollectionId = Guard.Against.Null(collectionId);
     }
 
@@ -51,50 +81,25 @@ public class Flashcard
         return new Flashcard(
             question,
             answer,
-            Grade.VeryHard,
+            Grade.Again,
+            State.Learning,
+            null,
+            null,
+            null,
             DateTime.UtcNow,
+            null,
             collectionId
         );
     }
 
-    public void ReturnToLastGrade()
+    public void SaveRecallInformation(DateTime nextRecall, Grade grade, State state, int? step, double? stability, double? difficulty)
     {
-        switch (Grade)
-        {
-            case Grade.VeryHard: break;
-            case Grade.Hard: Grade = Grade.VeryHard; break;
-            case Grade.Medium: Grade = Grade.Hard; break;
-            case Grade.Easy: Grade = Grade.Medium; break;
-            case Grade.VeryEasy: Grade = Grade.Easy; break;
-            default: break;
-        }
-        NextRecall = CalculateNextRecall();
-    }
-
-    public void AdvanceToNextGrade()
-    {
-        switch (Grade)
-        {
-            case Grade.VeryHard: Grade = Grade.Hard; break;
-            case Grade.Hard: Grade = Grade.Medium; break;
-            case Grade.Medium: Grade = Grade.Easy; break;
-            case Grade.Easy: Grade = Grade.VeryEasy; break;
-            case Grade.VeryEasy: break;
-            default: break;
-        }
-        NextRecall = CalculateNextRecall();
-    }
-
-    private DateTime CalculateNextRecall()
-    {
-        return Grade switch
-        {
-            Grade.VeryEasy => DateTime.UtcNow.AddDays(30),
-            Grade.Easy => DateTime.UtcNow.AddDays(14),
-            Grade.Medium => DateTime.UtcNow.AddDays(7),
-            Grade.Hard => DateTime.UtcNow.AddDays(3),
-            Grade.VeryHard => DateTime.UtcNow.AddDays(1),
-            _ => DateTime.UtcNow
-        };
+        NextRecall = nextRecall;
+        LastRecall = DateTime.UtcNow;
+        Step = step;
+        Stability = stability;
+        Difficulty = difficulty;
+        Grade = grade;
+        State = state;
     }
 }

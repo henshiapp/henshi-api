@@ -1,5 +1,9 @@
+using FSRS.Core.Enums;
+using FSRS.Core.Models;
+using FSRS.Core.Services;
 using Henshi.Flashcards.Domain.Models;
 using Henshi.Flashcards.Domain.Repositories;
+using Henshi.Flashcards.Domain.ValueObjects;
 using Henshi.Flashcards.Presentation.Dtos;
 using Henshi.Shared.Presentation.Dtos;
 
@@ -44,20 +48,26 @@ public class FlashcardService(IFlashcardRepository flashcardRepository) : IFlash
     {
         var flashcards = await _flashcardRepository.ListByCollectionId(collectionId, userId);
 
+        var scheduler = new Scheduler();
+
         foreach (var answer in answers)
         {
             var flashcard = flashcards.Where(f => f.Id == answer.FlashcardId).FirstOrDefault();
 
             if (flashcard is null) continue;
 
-            if (answer.Correct)
-            {
-                flashcard.AdvanceToNextGrade();
-            }
-            else
-            {
-                flashcard.ReturnToLastGrade();
-            }
+            var card = new Card(flashcard.Id, StateMapper.ToFsrs(flashcard.State), flashcard.Step, flashcard.Stability, flashcard.Difficulty, flashcard.NextRecall, flashcard.LastRecall);
+
+            var (updatedCard, reviewLog) = scheduler.ReviewCard(card, GradeMapper.ToFsrs(answer.Grade));
+
+            flashcard.SaveRecallInformation(
+                updatedCard.Due,
+                GradeMapper.FromFsrs(reviewLog.Rating),
+                StateMapper.FromFsrs(updatedCard.State),
+                updatedCard.Step,
+                updatedCard.Stability,
+                updatedCard.Difficulty
+            );
         }
 
         await _flashcardRepository.SaveChangesAsync();
