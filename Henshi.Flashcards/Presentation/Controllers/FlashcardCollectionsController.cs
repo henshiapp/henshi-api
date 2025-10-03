@@ -39,6 +39,46 @@ public class FlashcardCollectionsController(
         return Ok(ApiResponse<Task>.Success("Card collection created successfully!"));
     }
 
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetById(Guid id)
+    {
+        var userId = User.Id();
+
+        if (userId is null) return Unauthorized();
+
+        var collection = await _flashcardCollectionsService.GetById(id, userId);
+
+        if (collection is null)
+        {
+            return NotFound(ApiResponse<Task>.Error([], "Collection not found"));
+        }
+
+        return Ok(ApiResponse<FlashcardCollection>.Success(collection));
+    }
+
+    [HttpPatch("{id:guid}")]
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateFlashcardCollectionRequest request)
+    {
+        var userId = User.Id();
+
+        if (userId is null) return Unauthorized();
+
+        var updatedCollection = await _flashcardCollectionsService.Update(
+            id,
+            request.Title,
+            request.Description,
+            request.Icon,
+            userId
+        );
+
+        if (updatedCollection is null)
+        {
+            return NotFound(ApiResponse<Task>.Error([], "Collection not found"));
+        }
+
+        return Ok(ApiResponse<Task>.Success("Card collection updated successfully!"));
+    }
+
     [HttpGet]
     public async Task<IActionResult> List([FromQuery] ListFlashcardCollectionRequest request)
     {
@@ -84,6 +124,28 @@ public class FlashcardCollectionsController(
         return Ok(ApiResponse<Task>.Success("Flashcard created successfully!"));
     }
 
+    [HttpPatch("{collectionId:guid}/flashcards/{id:guid}")]
+    public async Task<IActionResult> UpdateFlashcard(Guid id, [FromBody] UpdateFlashcardRequest request)
+    {
+        var userId = User.Id();
+
+        if (userId is null) return Unauthorized();
+
+        var updatedFlashcard = await _flashcardService.Update(
+            id,
+            request.Question,
+            request.Answer,
+            userId
+        );
+
+        if (updatedFlashcard is null)
+        {
+            return NotFound(ApiResponse<Task>.Error([], "Flashcard not found"));
+        }
+
+        return Ok(ApiResponse<Task>.Success("Flashcard updated successfully!"));
+    }
+
     [HttpGet("{collectionId:guid}/flashcards")]
     public async Task<IActionResult> ListFlashcards(Guid collectionId, [FromQuery] ListFlashcardCollectionRequest request)
     {
@@ -96,6 +158,23 @@ public class FlashcardCollectionsController(
         return Ok(
             ApiResponse<List<Flashcard>>.Success(list, metadata)
         );
+    }
+
+    [HttpGet("{collectionId:guid}/flashcards/{id:guid}")]
+    public async Task<IActionResult> GetFlashcardById(Guid id)
+    {
+        var userId = User.Id();
+
+        if (userId is null) return Unauthorized();
+
+        var flashcard = await _flashcardService.GetById(id, userId);
+
+        if (flashcard is null)
+        {
+            return NotFound(ApiResponse<Task>.Error([], "Flashcard not found"));
+        }
+
+        return Ok(ApiResponse<Flashcard>.Success(flashcard));
     }
 
     [HttpDelete("{collectionId:guid}/flashcards/{id:guid}")]

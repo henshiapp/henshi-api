@@ -36,8 +36,27 @@ public class FlashcardCollectionService(
         return id;
     }
 
+    public async Task<FlashcardCollection?> GetById(Guid id, string userId)
+    {
+        return await _flashcardCollectionRepository.GetByIdAsync(id, userId);
+    }
+
     public async Task<(List<FlashcardCollection>, PaginationMetadata)> List(string? search, int page, int pageSize, string userId)
     {
         return await _flashcardCollectionRepository.ListAsync(search, userId, page, pageSize);
+    }
+
+    public async Task<FlashcardCollection?> Update(Guid id, string title, string? description, string icon, string userId)
+    {
+        var collection = await _flashcardCollectionRepository.GetByIdAsync(id, userId);
+
+        if (collection is null) return null;
+
+        collection.Title = title;
+        collection.Description = description;
+        collection.Icon = icon;
+
+        await _flashcardCollectionRepository.SaveChangesAsync();
+        return collection;
     }
 }

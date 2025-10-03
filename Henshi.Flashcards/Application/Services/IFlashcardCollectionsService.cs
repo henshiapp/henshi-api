@@ -7,5 +7,7 @@ public interface IFlashcardCollectionService
 {
     Task Create(string title, string? description, string icon, string userId);
     Task<Guid?> Delete(Guid id, string userId);
+    Task<FlashcardCollection?> GetById(Guid id, string userId);
     Task<(List<FlashcardCollection>, PaginationMetadata)> List(string? search, int page, int pageSize, string userId);
+    Task<FlashcardCollection?> Update(Guid id, string title, string? description, string icon, string userId);
 }

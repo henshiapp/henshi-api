@@ -34,6 +34,11 @@ public class FlashcardService(IFlashcardRepository flashcardRepository) : IFlash
         return id;
     }
 
+    public async Task<Flashcard?> GetById(Guid id, string userId)
+    {
+        return await _flashcardRepository.GetByIdAsync(id, userId);
+    }
+
     public async Task<(List<Flashcard>, PaginationMetadata)> List(Guid collectionId, string? search, int page, int pageSize, string userId)
     {
         return await _flashcardRepository.ListAsync(collectionId, search, userId, page, pageSize);
@@ -71,5 +76,19 @@ public class FlashcardService(IFlashcardRepository flashcardRepository) : IFlash
         }
 
         await _flashcardRepository.SaveChangesAsync();
+    }
+
+    public async Task<Flashcard?> Update(Guid id, string question, string answer, string userId)
+    {
+        var flashcard = await _flashcardRepository.GetByIdAsync(id, userId);
+
+        if (flashcard is null) return null;
+
+        flashcard.Question = question;
+        flashcard.Answer = answer;
+
+        await _flashcardRepository.SaveChangesAsync();
+
+        return flashcard;
     }
 }

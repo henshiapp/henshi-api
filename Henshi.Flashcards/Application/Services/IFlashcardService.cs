@@ -12,4 +12,6 @@ public interface IFlashcardService
     Task<List<Flashcard>> ListAvailableForRecall(Guid collectionId, string userId);
     Task<(List<Flashcard>, PaginationMetadata)> List(Guid collectionId, string? search, int page, int pageSize, string userId);
     Task SaveRecall(Guid collectionId, List<RecallFlashcardsResult> answers, string userId);
+    Task<Flashcard?> Update(Guid id, string question, string answer, string userId);
+    Task<Flashcard?> GetById(Guid id, string userId);
 }
