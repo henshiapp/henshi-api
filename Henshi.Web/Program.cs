@@ -1,9 +1,11 @@
 using System.Text.Json.Serialization;
-using Auth0.AspNetCore.Authentication;
-using Henshi.Flashcards.Infraestructure.Database;
-using Henshi.Flashcards.Infraestructure.Extensions;
-using Henshi.Flashcards.Presentation.Controllers;
+using Henshi.Flashcards.Database;
+using Henshi.Flashcards.Extensions;
+using Henshi.Shared.Extensions;
+using Henshi.Shared.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,16 +21,30 @@ var builder = WebApplication.CreateBuilder(args);
             options.Authority = $"https://{builder.Configuration["AUTH0_DOMAIN"]}";
             options.Audience = builder.Configuration["AUTH0_AUDIENCE"];
         });
-    builder.Services.AddAuthorization();
+    builder.Services.AddAuthorization(options =>
+    {
+        options.FallbackPolicy = new AuthorizationPolicyBuilder()
+            .RequireAuthenticatedUser()
+            .Build();
+    });
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("AllowAll", policy =>
+        {
+            policy.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        });
+    });
 
     builder.Services.AddOpenApi();
+    builder.Services.AddHttpContextAccessor();
+    builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
-    builder.Services.AddControllers()
-        .AddApplicationPart(typeof(FlashcardCollectionsController).Assembly)
-        .AddJsonOptions(options =>
-        {
-            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-        });
+    builder.Services.Configure<JsonOptions>(options =>
+        options.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+    builder.AddFlashcardModules();
 
     builder.Services.AddFlashcardServices(builder.Configuration);
 }
@@ -58,19 +74,12 @@ var app = builder.Build();
         app.MapOpenApi();
     }
 
-    // app.UseHttpsRedirection();
-    app.UseCors(option =>
-        option
-            .WithOrigins(builder.Configuration["Cors:Origins"]!)
-            .AllowCredentials()
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-    );
+    app.UseCors("AllowAll");
 
     app.UseAuthentication();
     app.UseAuthorization();
 
-    app.MapControllers();
+    app.MapMinimalEndpoints();
 }
 
 app.Run();

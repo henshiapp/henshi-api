@@ -21,7 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Data/Migrations/" />
+    <Folder Include="Database/Migrations/" />
+    <Folder Include="Flashcards/Features/UpdateFlashcard/V1/" />
   </ItemGroup>
 
   <ItemGroup>
